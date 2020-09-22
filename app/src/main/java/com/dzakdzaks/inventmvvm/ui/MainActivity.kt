@@ -128,7 +128,6 @@ class MainActivity : AppCompatActivity() {
         viewModel.getMsProducts().observe(this, {
             when (it.status) {
                 Resource.Status.SUCCESS -> {
-                    binding.progressBar.visibility = View.GONE
                     it.data?.let { _ ->
                         viewModel.getTxProducts()
                     }
@@ -150,7 +149,6 @@ class MainActivity : AppCompatActivity() {
                 Resource.Status.SUCCESS -> {
                     binding.progressBar.visibility = View.GONE
                     it.data?.let { _ ->
-
                     }
                 }
                 Resource.Status.ERROR -> {
