@@ -2,6 +2,7 @@ package com.dzakdzaks.inventmvvm.data.repository
 
 import com.dzakdzaks.inventmvvm.data.local.ProductDao
 import com.dzakdzaks.inventmvvm.data.remote.RemoteDataSource
+import com.dzakdzaks.inventmvvm.ui.FilterProduct
 import com.dzakdzaks.inventmvvm.util.performGetOperation
 import javax.inject.Inject
 
@@ -31,8 +32,7 @@ class ProductRepository @Inject constructor(
         saveCallResult = { local.insertTxProduct(it.value!!) }
     )
 
-    fun getAllProducts(key: String, isAsc: Boolean, orderBy: String) =
-        local.getAllProducts(key, isAsc, orderBy)
-
+    fun getAllProducts(filterProduct: FilterProduct) =
+        local.getAllProducts(filterProduct.key, filterProduct.isAsc)
 
 }

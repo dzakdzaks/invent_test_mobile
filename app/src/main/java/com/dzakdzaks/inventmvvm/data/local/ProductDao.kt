@@ -19,11 +19,18 @@ import com.dzakdzaks.inventmvvm.data.entity.TxProduct
 @Dao
 interface ProductDao {
 
+    /* @Transaction
+      @Query(
+          "SELECT * FROM MasterProduct WHERE msName LIKE '%' || :key || '%' ORDER BY CASE WHEN :isAsc = 1 THEN msName END ASC, CASE WHEN :isAsc = 0 THEN msName END DESC"
+      )
+      fun getAllProducts(key: String, isAsc: Boolean = true): LiveData<List<Product>>
+   */
+
     @Transaction
     @Query(
-        "SELECT * FROM TxProduct WHERE txName LIKE '%' || :key || '%' OR txPrice LIKE '%' || :key || '%' ORDER BY CASE WHEN :isAsc = 1 AND :orderBy = 'txName' THEN txName END ASC, CASE WHEN :isAsc = 0 AND :orderBy = 'txName' THEN txName END DESC, CASE WHEN :isAsc = 1 AND :orderBy = 'txPrice' THEN txPrice END ASC, CASE WHEN :isAsc = 0 AND :orderBy = 'txPrice' THEN txPrice END DESC"
+        "SELECT * FROM MasterProduct WHERE msName LIKE '%' || :key || '%' ORDER BY CASE WHEN :isAsc = 1 THEN msName END ASC, CASE WHEN :isAsc = 0 THEN msName END DESC"
     )
-    fun getAllProducts(key: String, isAsc: Boolean = true, orderBy: String): LiveData<List<Product>>
+    fun getAllProducts(key: String, isAsc: Boolean = true): LiveData<List<Product>>
 
     @Query("SELECT * FROM MasterProduct")
     fun getMasterProducts(): LiveData<List<MasterProduct>>

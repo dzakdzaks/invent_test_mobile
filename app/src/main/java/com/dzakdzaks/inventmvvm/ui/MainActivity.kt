@@ -1,19 +1,18 @@
 package com.dzakdzaks.inventmvvm.ui
 
+import android.animation.LayoutTransition
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dzakdzaks.inventmvvm.R
-import com.dzakdzaks.inventmvvm.data.entity.Product
-import com.dzakdzaks.inventmvvm.data.entity.TxProduct
 import com.dzakdzaks.inventmvvm.databinding.ActivityMainBinding
 import com.dzakdzaks.inventmvvm.util.DelayedSearchTextWatcher
 import com.dzakdzaks.inventmvvm.util.Resource
-import com.dzakdzaks.inventmvvm.util.autoFitColumns
 import com.dzakdzaks.inventmvvm.util.closeKeyboard
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
@@ -28,12 +27,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: ProductAdapter
     private val viewModel: MainViewModel by viewModels()
     private var keySearch: String = ""
+    private lateinit var filterProduct: FilterProduct
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        Timber.tag("wawaw").d("oncreate")
+        binding.parentLayout.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
         setupProduct()
         searchTextWatcher()
         clickable()
@@ -41,7 +42,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun clickable() {
-        binding.toolbar.tfSearch.setStartIconOnClickListener { viewModel.setSearchKey(keySearch) }
         binding.toolbar.layoutFilter.setOnClickListener { showPopUp() }
     }
 
@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
             DelayedSearchTextWatcher.OnTextWatcher {
             override fun onAfterTextChanged(s: String) {
                 keySearch = s
-                viewModel.setSearchKey(keySearch)
+                initFilterData()
             }
         }))
         binding.toolbar.tfSearch.editText?.setOnEditorActionListener { _, actionId, _ ->
@@ -64,7 +64,14 @@ class MainActivity : AppCompatActivity() {
     private fun performSearch() {
         binding.toolbar.tfSearch.editText?.clearFocus()
         closeKeyboard(this, binding.toolbar.tfSearch)
-        viewModel.setSearchKey(keySearch)
+        initFilterData()
+    }
+
+    private fun initFilterData() {
+        if (::filterProduct.isInitialized)
+            viewModel.setFilter(keySearch, filterProduct.isAsc)
+        else
+            viewModel.setFilter()
     }
 
     private fun showPopUp() {
@@ -76,16 +83,10 @@ class MainActivity : AppCompatActivity() {
         popupMenu.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.sortByNameAsc -> {
-                    observeProducts(keySearch, true, TxProduct.TX_NAME)
+                    viewModel.setFilter(keySearch, true)
                 }
                 R.id.sortByNameDesc -> {
-                    observeProducts(keySearch, false, TxProduct.TX_NAME)
-                }
-                R.id.sortByPriceAsc -> {
-                    observeProducts(keySearch, true, TxProduct.TX_PRICE)
-                }
-                R.id.sortByPriceDesc -> {
-                    observeProducts(keySearch, false, TxProduct.TX_PRICE)
+                    viewModel.setFilter(keySearch, false)
                 }
             }
             true
@@ -93,15 +94,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupProduct() {
-        adapter = ProductAdapter(object : ProductAdapter.ProductClickListener {
-            override fun onProductClicked(data: Product) {
-                Snackbar.make(
-                    binding.parentLayout,
-                    "${data.msProduct.msName}",
-                    Snackbar.LENGTH_SHORT
-                ).show()
-            }
-        }).apply {
+        adapter = ProductAdapter().apply {
             registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
                 override fun onChanged() {
                     super.onChanged()
@@ -120,68 +113,52 @@ class MainActivity : AppCompatActivity() {
                 }
             })
         }
-        binding.rvData.autoFitColumns(200)
-        binding.rvData.adapter = adapter
+        binding.rvData.apply {
+            layoutManager = GridLayoutManager(this@MainActivity, 2)
+            adapter = this@MainActivity.adapter
+        }
     }
 
     private fun observeData() {
-        viewModel.getMsProducts().observe(this, {
+        initFilterData()
+        viewModel.getMsProducts.observe(this, {
             when (it.status) {
                 Resource.Status.SUCCESS -> {
                     it.data?.let { _ ->
-                        viewModel.getTxProducts()
+
                     }
                 }
                 Resource.Status.ERROR -> {
                     binding.progressBar.visibility = View.GONE
-                    Snackbar.make(
-                        binding.parentLayout,
-                        "${it.message}",
-                        Snackbar.LENGTH_SHORT
-                    ).show()
+                    Timber.tag("errorWoy").d(it.message)
                 }
                 Resource.Status.LOADING -> binding.progressBar.visibility = View.VISIBLE
             }
         })
 
-        viewModel.getTxProducts().observe(this, {
+        viewModel.getTxProducts.observe(this, {
             when (it.status) {
                 Resource.Status.SUCCESS -> {
-                    binding.progressBar.visibility = View.GONE
                     it.data?.let { _ ->
+                        binding.progressBar.visibility = View.GONE
                     }
                 }
                 Resource.Status.ERROR -> {
                     binding.progressBar.visibility = View.GONE
-                    Snackbar.make(
-                        binding.parentLayout,
-                        "${it.message}",
-                        Snackbar.LENGTH_SHORT
-                    ).show()
+                    Timber.tag("errorWoy").d(it.message)
                 }
                 Resource.Status.LOADING -> binding.progressBar.visibility = View.VISIBLE
             }
         })
 
-        viewModel.searchKey.observe(this, {
-            observeProducts(it)
+        viewModel.getFilter.observe(this, {
+            filterProduct = it
         })
 
-        observeProducts()
-
-    }
-
-    private fun observeProducts(
-        key: String = "",
-        isAsc: Boolean = true,
-        orderBy: String = TxProduct.TX_NAME
-    ) {
-        viewModel.getAllProducts(key, isAsc, orderBy).observe(this, { products ->
+        viewModel.prods.observe(this, { products ->
             products?.let { list ->
-                Timber.tag("wakwaw").d(Gson().toJson(list))
-                adapter.products?.clear()
-                adapter.products?.addAll(list)
-                adapter.notifyDataSetChanged()
+                Timber.tag("wawaw").d(Gson().toJson(list))
+                adapter.setItems(list)
             }
         })
     }

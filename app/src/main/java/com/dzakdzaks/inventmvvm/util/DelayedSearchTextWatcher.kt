@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
  * ==================================//==================================
  */
 class DelayedSearchTextWatcher(private val onTextWatcher: OnTextWatcher) : TextWatcher {
-    var job: Job? = null
+    private var job: Job? = null
 
     override fun afterTextChanged(s: Editable?) {
         job = MainScope().launch {

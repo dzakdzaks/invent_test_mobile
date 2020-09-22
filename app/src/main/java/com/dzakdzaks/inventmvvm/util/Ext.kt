@@ -29,9 +29,9 @@ fun RecyclerView.autoFitColumns(columnWidth: Int) {
 
 fun String.formatCurrency(): String? {
     val value: String?
-    val formatter = DecimalFormat("#,###,###")
+    val formatter = DecimalFormat("#,###.##")
     val symbols = DecimalFormatSymbols(Locale("id", "ID"))
     formatter.decimalFormatSymbols = symbols
     value = formatter.format(java.lang.Double.valueOf(this))
-    return "Rp $value"
+    return "Rp $value,-"
 }

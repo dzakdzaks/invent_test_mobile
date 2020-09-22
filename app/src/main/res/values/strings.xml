@@ -6,6 +6,12 @@
     <string name="no_data_available">There are no products available at this time.</string>
     <string name="sort_by_name_asc">Sort A -> Z</string>
     <string name="sort_by_name_desc">Sort Z -> A</string>
-    <string name="sort_by_price_asc">Sort from low price</string>
-    <string name="sort_by_price_desc">Sort from high price</string>
+    <string name="sort_by_price_asc">lowest price</string>
+    <string name="sort_by_price_desc">highest price</string>
+    <string name="dummy_text">Lorem Ipsum dolor sit amet</string>
+    <string name="branch_here">Branch Here</string>
+    <string name="dummy_price">Rp 35.000</string>
+    <string name="image_product">image_product</string>
+    <string name="branch">%1$s\'s Branch</string>
+    <string name="no_price">There is no price on this item</string>
 </resources>

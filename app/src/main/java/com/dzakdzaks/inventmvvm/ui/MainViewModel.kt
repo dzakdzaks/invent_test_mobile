@@ -4,7 +4,9 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
 import com.dzakdzaks.inventmvvm.data.entity.MasterProduct
+import com.dzakdzaks.inventmvvm.data.entity.Product
 import com.dzakdzaks.inventmvvm.data.entity.TxProduct
 import com.dzakdzaks.inventmvvm.data.repository.ProductRepository
 import com.dzakdzaks.inventmvvm.util.Resource
@@ -24,26 +26,24 @@ class MainViewModel @ViewModelInject constructor(
     private val productRepository: ProductRepository
 ) : ViewModel() {
 
-    var searchKey = MutableLiveData<String>()
-
-
-    init {
-        getMsProducts()
-    }
-
-    fun getMsProducts(): LiveData<Resource<List<MasterProduct>>> =
+    val getMsProducts: LiveData<Resource<List<MasterProduct>>> =
         productRepository.getMasterProduct()
 
-    fun getTxProducts(): LiveData<Resource<List<TxProduct>>> = productRepository.getTxProducts()
+    val getTxProducts: LiveData<Resource<List<TxProduct>>> = productRepository.getTxProducts()
 
-    fun setSearchKey(newKey: String) {
-        searchKey.value = newKey
+    private val _filterProduct = MutableLiveData<FilterProduct>()
+
+    private val _prods = _filterProduct.switchMap { key ->
+        productRepository.getAllProducts(key)
     }
 
-    fun getAllProducts(
-        searchKey: String = "",
-        isAsc: Boolean = true,
-        orderBy: String = TxProduct.TX_NAME
-    ) =
-        productRepository.getAllProducts(searchKey, isAsc, orderBy)
+    val prods: LiveData<List<Product>> = _prods
+
+    fun setFilter(key: String = "", isAsc: Boolean = true) {
+        val filterProduct = FilterProduct(key, isAsc)
+        _filterProduct.value = filterProduct
+    }
+
+    val getFilter: LiveData<FilterProduct> = _filterProduct
+
 }

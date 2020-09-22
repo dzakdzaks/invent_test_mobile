@@ -20,6 +20,7 @@
             android:id="@+id/ivProduct"
             android:layout_width="match_parent"
             android:layout_height="130dp"
+            android:contentDescription="@string/image_product"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_launcher_background" />
 
@@ -28,35 +29,33 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/ivProduct"
+            android:text="@string/dummy_text"
+            android:textAlignment="center"
+            android:textColor="@android:color/black"
             android:layout_margin="5dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="Lorem Ipsum dolor sit amet" />
+            android:textStyle="bold" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSwitchSort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvName"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:text="@string/sort_by_price_asc"
+            android:textAllCaps="false" />
 
-        <TextView
-            android:id="@+id/tvPrice"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvProductTx"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tvName"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="5dp"
-            android:maxLines="1"
-            android:text="Rp 35.000" />
+            android:layout_below="@+id/btnSwitchSort"
+            android:layout_margin="5dp"
+            android:nestedScrollingEnabled="false" />
 
-
-        <TextView
-            android:id="@+id/tvBranch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tvPrice"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="10dp"
-            android:maxLines="1"
-            android:text="Branch Here" />
 
     </RelativeLayout>
 

@@ -12,7 +12,6 @@ import androidx.room.Relation
  * ==================================//==================================
  * ==================================//==================================
  */
-/*
 data class Product(
     @Embedded val msProduct: MasterProduct,
     @Relation(
@@ -20,12 +19,4 @@ data class Product(
         entityColumn = "txCode"
     )
     val txProducts: List<TxProduct>
-)*/
-data class Product(
-    @Embedded val txProduct: TxProduct,
-    @Relation(
-        parentColumn = "txCode",
-        entityColumn = "msCode"
-    )
-    val msProduct: MasterProduct
 )

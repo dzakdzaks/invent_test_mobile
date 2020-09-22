@@ -22,9 +22,4 @@ data class TxProduct(
 	@PrimaryKey
 	@field:SerializedName("id")
 	val txID: String
-) {
-	companion object {
-		val TX_NAME = "txName"
-		val TX_PRICE = "txPrice"
-	}
-}
+)
