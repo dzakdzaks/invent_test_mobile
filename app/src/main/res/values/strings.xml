@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">InventMVVM</string>
+    <string name="search">Search</string>
+    <string name="sorting_data">Sorting Data</string>
+    <string name="not_found_data_search">Products with keyword \"%1$s\" can not be found.</string>
+    <string name="no_data_available">There are no products available at this time.</string>
+    <string name="sort_by_name_asc">Sort A -> Z</string>
+    <string name="sort_by_name_desc">Sort Z -> A</string>
+    <string name="sort_by_price_asc">Sort from low price</string>
+    <string name="sort_by_price_desc">Sort from high price</string>
+</resources>
